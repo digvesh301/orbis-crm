@@ -18,7 +18,7 @@ export default defineConfig({
 		// Proxy API calls to Rust backend — avoids CORS in dev
 		proxy: {
 			'/api': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:8000',
 				changeOrigin: true,
 			},
 		},

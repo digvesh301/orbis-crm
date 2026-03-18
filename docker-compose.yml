@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # ─── Database ─────────────────────────────────────────────────────────────
   db:
     image: postgres:15-alpine
     container_name: orbis-db
@@ -16,28 +17,32 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - orbis-net
 
+  # ─── Cache ────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: orbis-redis
     restart: unless-stopped
+    networks:
+      - orbis-net
 
-  backend:  
+  # ─── Backend (Rust API) ───────────────────────────────────────────────────
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: orbis-backend
-    ports:
-      - "8000:8000"
+    # Port NOT exposed to host - only Nginx can reach it internally
+    expose:
+      - "8000"
     environment:
-      # Database and Redis connections match service names
       DATABASE_URL: postgres://orbis_user:orbis_password@db:5432/orbis_crm
       REDIS_URL: redis://redis:6379
       PORT: 8000
       JWT_SECRET: your_super_secret_jwt_key_here_override_in_production
-      # VITE_API_BASE_URL (Backend might need frontend URL for resend emails later)
-      FRONTEND_URL: http://localhost:80
-      # Add your real RESEND_API_KEY for email functionality
+      FRONTEND_URL: http://localhost
       RESEND_API_KEY: ""
     depends_on:
       db:
@@ -45,22 +50,46 @@ services:
       redis:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - orbis-net
 
+  # ─── Frontend (React / Vite) ──────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # Pass backend URL at build time so Vite embeds it into the JS chunk
-        # Assuming users hit your local machine's or remote server's localhost on port 8000
-        VITE_API_BASE_URL: http://localhost:8000/api/v1
+        # API calls go through Nginx, so frontend hits the same host
+        VITE_API_BASE_URL: /api/v1
         VITE_APP_NAME: Orbis
     container_name: orbis-frontend
-    ports:
-      - "80:80"
+    # Not exposed to host - only Nginx proxy reaches it
+    expose:
+      - "80"
     depends_on:
       - backend
     restart: unless-stopped
+    networks:
+      - orbis-net
+
+  # ─── Nginx Reverse Proxy (single public entry point) ─────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: orbis-nginx
+    ports:
+      - "80:80"       # HTTP  – change to 443:443 when you add SSL
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - orbis-net
+
+networks:
+  orbis-net:
+    driver: bridge
 
 volumes:
   pgdata:
