@@ -1,0 +1,70 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE contacts SET\n            first_name       = COALESCE($3,  first_name),\n            last_name        = COALESCE($4,  last_name),\n            email            = COALESCE($5,  email),\n            phone            = COALESCE($6,  phone),\n            mobile           = COALESCE($7,  mobile),\n            title            = COALESCE($8,  title),\n            department       = COALESCE($9,  department),\n            description      = COALESCE($10, description),\n            account_id       = COALESCE($11, account_id),\n            owner_id         = COALESCE($12, owner_id),\n            tags             = COALESCE($13, tags),\n            address          = COALESCE($14, address),\n            linkedin_url     = COALESCE($15, linkedin_url),\n            twitter_handle   = COALESCE($16, twitter_handle),\n            do_not_email     = COALESCE($17, do_not_email),\n            do_not_call      = COALESCE($18, do_not_call),\n            do_not_sms       = COALESCE($19, do_not_sms),\n            updated_at       = NOW()\n        WHERE id = $1 AND org_id = $2 AND deleted_at IS NULL\n        RETURNING id, first_name, last_name, email, phone, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "TextArray",
+        "Jsonb",
+        "Text",
+        "Text",
+        "Bool",
+        "Bool",
+        "Bool"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "82456eab0dc91d9d66ef56afc776bda1c8dda38e38a3d111f189f645bbf50eb2"
+}

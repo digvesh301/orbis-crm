@@ -1,0 +1,39 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE activities\n        SET \n            status = COALESCE(CAST($3::text as activity_status), status),\n            subject = COALESCE($4, subject),\n            description = COALESCE($5, description),\n            outcome = COALESCE($6, outcome),\n            due_date = COALESCE($7, due_date),\n            start_time = COALESCE($8, start_time),\n            end_time = COALESCE($9, end_time),\n            assigned_to = COALESCE($10, assigned_to),\n            priority = COALESCE($11, priority),\n            updated_at = NOW(),\n            completed_at = CASE \n                WHEN CAST($3::text as activity_status) = 'completed' AND status != 'completed' THEN NOW()\n                ELSE completed_at\n            END,\n            completed_by = CASE\n                WHEN CAST($3::text as activity_status) = 'completed' AND status != 'completed' THEN $12\n                ELSE completed_by\n            END\n        WHERE id = $1 AND org_id = $2 AND deleted_at IS NULL\n        RETURNING id, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Date",
+        "Timestamptz",
+        "Timestamptz",
+        "Uuid",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "fbd0f467a00158efe1ed1b238111c19c53cfc894bb9896049eb861cac58a7734"
+}

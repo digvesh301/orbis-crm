@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO contacts (\n            org_id, first_name, last_name, email, phone, mobile,\n            title, department, description, account_id, owner_id,\n            tags, address, linkedin_url, twitter_handle,\n            do_not_email, do_not_call, do_not_sms, created_by\n        )\n        VALUES (\n            $1, $2, $3, $4, $5, $6,\n            $7, $8, $9, $10, $11,\n            $12, $13, $14, $15,\n            $16, $17, $18, $19\n        )\n        RETURNING id, first_name, last_name, email, phone, status::text as \"status!\",\n                  account_id, owner_id, tags, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "account_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 8,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "TextArray",
+        "Jsonb",
+        "Text",
+        "Text",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      null,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "bc8938d6630bda7cfe16de941f960e4470629ad0279f222b144587f4ef9e7285"
+}

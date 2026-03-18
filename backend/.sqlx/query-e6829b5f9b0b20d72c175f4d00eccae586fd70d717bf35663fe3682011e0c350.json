@@ -1,0 +1,63 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO leads (\n            org_id, first_name, last_name, email, phone, company, title, website, description,\n            status, lead_source, rating, tags, estimated_value, currency, address, owner_id, created_by\n        )\n        VALUES (\n            $1, $2, $3, $4, $5, $6, $7, $8, $9,\n            CAST($10::text as lead_status), CAST($11::text as lead_source), $12, $13, $14, $15, $16, $17, $18\n        )\n        RETURNING id, first_name, last_name, company, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "company",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "TextArray",
+        "Numeric",
+        "Text",
+        "Jsonb",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "e6829b5f9b0b20d72c175f4d00eccae586fd70d717bf35663fe3682011e0c350"
+}

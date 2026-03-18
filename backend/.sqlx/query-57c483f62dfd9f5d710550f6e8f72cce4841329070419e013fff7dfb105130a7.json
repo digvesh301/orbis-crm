@@ -1,0 +1,126 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT\n                a.id, a.name, a.website, a.phone, a.email,\n                a.industry, a.account_type, a.employee_count,\n                a.annual_revenue, a.rating, a.is_active,\n                a.owner_id, a.created_at, a.updated_at,\n                COALESCE(u.first_name, '') as \"owner_first_name!\",\n                COALESCE(u.last_name,  '') as \"owner_last_name!\",\n                (SELECT COUNT(*) FROM contacts c\n                 WHERE c.account_id = a.id AND c.deleted_at IS NULL) as contact_count,\n                (SELECT COUNT(*) FROM opportunities o\n                 WHERE o.account_id = a.id AND o.deleted_at IS NULL) as deal_count\n            FROM accounts a\n            LEFT JOIN users u ON u.id = a.owner_id AND u.deleted_at IS NULL\n            WHERE a.org_id = $1 AND a.deleted_at IS NULL\n            ORDER BY a.created_at DESC\n            LIMIT $2 OFFSET $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "website",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "industry",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "account_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "employee_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "annual_revenue",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 9,
+        "name": "rating",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 13,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 14,
+        "name": "owner_first_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "owner_last_name!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 16,
+        "name": "contact_count",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 17,
+        "name": "deal_count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "57c483f62dfd9f5d710550f6e8f72cce4841329070419e013fff7dfb105130a7"
+}

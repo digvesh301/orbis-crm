@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            COALESCE(SUM(o.amount), 0) as pipeline_value,\n            COUNT(*) as total_deals\n        FROM opportunities o\n        WHERE o.account_id = $1 AND o.org_id = $2 AND o.deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "pipeline_value",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 1,
+        "name": "total_deals",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "7ae406f413d09e12068a3a72e35e5c93d86a3c746db148bdac752802ed996b96"
+}

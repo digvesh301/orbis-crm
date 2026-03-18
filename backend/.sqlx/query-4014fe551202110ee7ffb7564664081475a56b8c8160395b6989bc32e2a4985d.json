@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT p.is_system, p.permissions \n            FROM users u\n            JOIN profiles p ON u.profile_id = p.id\n            WHERE u.id = $1 AND u.org_id = $2 AND u.deleted_at IS NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_system",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "permissions",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "4014fe551202110ee7ffb7564664081475a56b8c8160395b6989bc32e2a4985d"
+}

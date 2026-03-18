@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO opportunity_stage_history (opportunity_id, org_id, from_stage_id, to_stage_id, changed_by) VALUES ($1, $2, $3, $4, $5)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3046cc541e8c1966e65498da13913a1dc746f3fa4fc85d0ba8584c49d350f95d"
+}

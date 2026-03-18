@@ -1,0 +1,94 @@
+[package]
+name = "orbis-backend"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "orbis"
+path = "src/main.rs"
+
+# ─── Disable default OpenSSL features globally ────────────────────────────────
+# We use rustls everywhere — no system libssl-dev required
+[features]
+default = []
+
+[dependencies]
+# Web framework
+axum = { version = "0.7", features = ["multipart", "macros"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace", "timeout", "limit", "compression-full", "request-id", "catch-panic"] }
+
+# Database — uses rustls (no OpenSSL)
+sqlx = { version = "0.8", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "uuid",
+    "chrono",
+    "json",
+    "bigdecimal",
+    "migrate"
+] }
+
+# Redis — uses tokio async (no OpenSSL needed for plain TCP)
+redis = { version = "0.25", features = ["tokio-comp", "connection-manager"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Auth — pure Rust, no OpenSSL
+jsonwebtoken = "9"
+argon2 = "0.5"
+
+# IDs & Time
+uuid = { version = "1", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Env & Config
+dotenvy = "0.15"
+
+# Error Handling
+thiserror = "1"
+anyhow = "1"
+
+# Validation
+validator = { version = "0.18", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# HTTP client — uses rustls-tls instead of default OpenSSL
+# default-features = false removes the openssl dependency
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "multipart",
+    "rustls-tls",    # ← pure Rust TLS, no libssl-dev needed
+    "http2",
+] }
+
+# Async utilities
+futures = "0.3"
+async-trait = "0.1"
+
+# Random
+rand = "0.8"
+
+# Cryptography (for token hashing)
+sha2 = "0.10"
+
+# Decimal types (money, annual_revenue — PostgreSQL NUMERIC)
+bigdecimal = { version = "0.4", features = ["serde"] }
+rust_decimal = { version = "1", features = ["serde-with-str"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 1          # slight optimization even in dev for faster runtime
+debug = true
+incrementalcompilation = true

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO audit_logs (org_id, user_id, action, entity_type, entity_id, entity_name) VALUES ($1, $2, 'updated', 'lead', $3, $4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "89d8472ab3f3e453da14247a7792bcfecabd60f63832682cdab9dba1c97055ce"
+}

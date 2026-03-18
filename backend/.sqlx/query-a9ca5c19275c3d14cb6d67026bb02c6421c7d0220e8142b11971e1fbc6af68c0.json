@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT o.id, o.name, o.amount, ps.name as stage_name\n        FROM opportunities o\n        JOIN pipeline_stages ps ON ps.id = o.stage_id\n        WHERE o.account_id = $1 AND o.org_id = $2 AND o.deleted_at IS NULL\n        ORDER BY o.created_at DESC LIMIT 5\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "amount",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "stage_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "a9ca5c19275c3d14cb6d67026bb02c6421c7d0220e8142b11971e1fbc6af68c0"
+}

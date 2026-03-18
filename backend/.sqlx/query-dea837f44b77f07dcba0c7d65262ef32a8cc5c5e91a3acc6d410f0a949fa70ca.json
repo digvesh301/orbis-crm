@@ -1,0 +1,64 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT u.id, u.first_name, u.last_name, u.email, u.org_id,\n               u.avatar_url, u.is_email_verified, o.name as org_name\n        FROM users u\n        JOIN organizations o ON o.id = u.org_id\n        WHERE u.id = $1 AND u.deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "org_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "avatar_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "is_email_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "org_name",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "dea837f44b77f07dcba0c7d65262ef32a8cc5c5e91a3acc6d410f0a949fa70ca"
+}

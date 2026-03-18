@@ -1,0 +1,44 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE opportunities\n        SET \n            name = COALESCE($3, name),\n            description = COALESCE($4, description),\n            contact_id = COALESCE($5, contact_id),\n            account_id = COALESCE($6, account_id),\n            stage_id = COALESCE($7, stage_id),\n            amount = COALESCE($8, amount),\n            currency = COALESCE($9, currency),\n            probability = COALESCE($10, probability),\n            close_date = COALESCE($11, close_date),\n            actual_close_date = COALESCE($12, actual_close_date),\n            lead_source = COALESCE(CAST($13::text as lead_source), lead_source),\n            tags = COALESCE($14, tags),\n            owner_id = COALESCE($15, owner_id),\n            lost_reason = COALESCE($16, lost_reason),\n            stage_type = COALESCE(CAST($17::text as opportunity_stage_type), stage_type),\n            updated_at = NOW()\n        WHERE id = $1 AND org_id = $2 AND deleted_at IS NULL\n        RETURNING id, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Numeric",
+        "Text",
+        "Int4",
+        "Date",
+        "Date",
+        "Text",
+        "TextArray",
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "2a7f4d461bd131f094d6bf7eb2455b07894fbf4ccb1a17b91d55282944fe333a"
+}

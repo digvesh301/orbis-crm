@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE quotes SET subtotal = $1, tax_amount = $2, total_amount = $3 WHERE id = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Numeric",
+        "Numeric",
+        "Numeric",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "11be0ac0e2b060ad10dc3a83ef6b0ba72602f898d919c73d65c2aa9d010a30c8"
+}

@@ -1,0 +1,149 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            a.id, a.name, a.website, a.phone, a.email,\n            a.industry, a.account_type, a.description,\n            a.employee_count, a.annual_revenue, a.rating,\n            a.is_active, a.owner_id,\n            a.parent_account_id,\n            a.billing_address, a.shipping_address,\n            a.created_at, a.updated_at,\n            u.first_name as \"owner_first_name?\",\n            u.last_name  as \"owner_last_name?\",\n            u.avatar_url as \"owner_avatar?\",\n            p.name as \"parent_name?\"\n        FROM accounts a\n        LEFT JOIN users    u ON u.id = a.owner_id         AND u.deleted_at IS NULL\n        LEFT JOIN accounts p ON p.id = a.parent_account_id AND p.deleted_at IS NULL\n        WHERE a.id = $1 AND a.org_id = $2 AND a.deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "website",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "industry",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "account_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "employee_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 9,
+        "name": "annual_revenue",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 10,
+        "name": "rating",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "is_active",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 12,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 13,
+        "name": "parent_account_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 14,
+        "name": "billing_address",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 15,
+        "name": "shipping_address",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 16,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 18,
+        "name": "owner_first_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 19,
+        "name": "owner_last_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 20,
+        "name": "owner_avatar?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "parent_name?",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "793b1fb08b701be9ba23b95b7806d4f2696c2e4d12a4868e4ee277fc8702a102"
+}

@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT probability, stage_type::text as stage_type FROM pipeline_stages WHERE id = $1 AND org_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "probability",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "stage_type",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "4fb4e7121ab3701b3e3526f91625f027ffa4fee1912717832733560fdd5c37cc"
+}

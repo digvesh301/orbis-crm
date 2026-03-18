@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: orbis-db
+    environment:
+      POSTGRES_USER: orbis_user
+      POSTGRES_PASSWORD: orbis_password
+      POSTGRES_DB: orbis_crm
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orbis_user -d orbis_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: orbis-redis
+    restart: unless-stopped
+
+  backend:  
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: orbis-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Database and Redis connections match service names
+      DATABASE_URL: postgres://orbis_user:orbis_password@db:5432/orbis_crm
+      REDIS_URL: redis://redis:6379
+      PORT: 8000
+      JWT_SECRET: your_super_secret_jwt_key_here_override_in_production
+      # VITE_API_BASE_URL (Backend might need frontend URL for resend emails later)
+      FRONTEND_URL: http://localhost:80
+      # Add your real RESEND_API_KEY for email functionality
+      RESEND_API_KEY: ""
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Pass backend URL at build time so Vite embeds it into the JS chunk
+        # Assuming users hit your local machine's or remote server's localhost on port 8000
+        VITE_API_BASE_URL: http://localhost:8000/api/v1
+        VITE_APP_NAME: Orbis
+    container_name: orbis-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:

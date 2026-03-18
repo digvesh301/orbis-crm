@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE notes\n        SET \n            content = COALESCE($3, content),\n            content_type = COALESCE($4, content_type),\n            is_pinned = COALESCE($5, is_pinned),\n            is_private = COALESCE($6, is_private),\n            mentioned_users = COALESCE($7, mentioned_users),\n            updated_at = NOW(),\n            updated_by = $8\n        WHERE id = $1 AND org_id = $2 AND deleted_at IS NULL\n        RETURNING id, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Bool",
+        "Bool",
+        "UuidArray",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "df6ca97876069d9e8ebad1847c19a6d798b218c5ad976459ded29f781f664204"
+}

@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO opportunities (\n            org_id, name, description, contact_id, account_id, stage_id,\n            amount, currency, probability, close_date, lead_source, tags, owner_id, created_by,\n            stage_type\n        )\n        VALUES (\n            $1, $2, $3, $4, $5, $6,\n            $7, $8, $9, $10, CAST($11::text as lead_source), $12, $13, $14,\n            CAST($15::text as opportunity_stage_type)\n        )\n        RETURNING id, name, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Numeric",
+        "Text",
+        "Int4",
+        "Date",
+        "Text",
+        "TextArray",
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "815aef66dc0505aa684cdcbba23bb039269eb4526d0da4e39fbdd6d48ce4b2d4"
+}

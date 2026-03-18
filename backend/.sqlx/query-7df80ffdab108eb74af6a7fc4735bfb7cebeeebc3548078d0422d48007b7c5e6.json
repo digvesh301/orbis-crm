@@ -1,0 +1,185 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            c.id, c.first_name, c.last_name, c.email, c.phone, c.mobile,\n            c.title, c.department, c.description,\n            c.status::text as \"status!\",\n            c.lead_source::text as \"lead_source?\",\n            c.account_id, c.owner_id,\n            c.avatar_url, c.tags,\n            c.address, c.linkedin_url, c.twitter_handle,\n            c.do_not_email, c.do_not_call, c.do_not_sms,\n            c.date_of_birth, c.created_at, c.updated_at,\n            a.name as \"account_name?\",\n            u.first_name as \"owner_first_name?\",\n            u.last_name  as \"owner_last_name?\",\n            u.avatar_url as \"owner_avatar?\"\n        FROM contacts c\n        LEFT JOIN accounts a ON a.id = c.account_id AND a.deleted_at IS NULL\n        LEFT JOIN users    u ON u.id = c.owner_id   AND u.deleted_at IS NULL\n        WHERE c.id = $1 AND c.org_id = $2 AND c.deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "mobile",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "department",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "lead_source?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "account_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 12,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 13,
+        "name": "avatar_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 14,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 15,
+        "name": "address",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 16,
+        "name": "linkedin_url",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 17,
+        "name": "twitter_handle",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "do_not_email",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 19,
+        "name": "do_not_call",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 20,
+        "name": "do_not_sms",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 21,
+        "name": "date_of_birth",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 22,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 23,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 24,
+        "name": "account_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 25,
+        "name": "owner_first_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 26,
+        "name": "owner_last_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 27,
+        "name": "owner_avatar?",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      null,
+      null,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "7df80ffdab108eb74af6a7fc4735bfb7cebeeebc3548078d0422d48007b7c5e6"
+}

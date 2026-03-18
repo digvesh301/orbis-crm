@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE users\n        SET \n            first_name = COALESCE($2, first_name),\n            last_name = COALESCE($3, last_name),\n            title = COALESCE($4, title),\n            updated_at = NOW()\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c96e759c97e17a721f3d488fb0c352501933e32c6d85eff6f62c31de3577ae81"
+}

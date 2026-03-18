@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT seed_new_organization($1)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "seed_new_organization",
+        "type_info": "Void"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "6677de5441686ed3f22bf2318e05e1e16593b2e92e2c58c0d73cefa27801ed65"
+}

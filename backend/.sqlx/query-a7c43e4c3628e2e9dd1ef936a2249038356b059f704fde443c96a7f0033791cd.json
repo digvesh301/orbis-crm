@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, name, stage_type::text as \"stage_type\", probability, position, color,\n               is_default, is_system, created_at, updated_at\n        FROM pipeline_stages\n        WHERE org_id = $1\n        ORDER BY position ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "stage_type",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "probability",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "position",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "is_default",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "is_system",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 8,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a7c43e4c3628e2e9dd1ef936a2249038356b059f704fde443c96a7f0033791cd"
+}

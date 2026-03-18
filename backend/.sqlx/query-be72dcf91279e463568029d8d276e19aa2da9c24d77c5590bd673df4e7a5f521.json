@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            COUNT(*)                                       as total,\n            COUNT(*) FILTER (WHERE activity_type = 'call')     as calls,\n            COUNT(*) FILTER (WHERE activity_type = 'email')    as emails,\n            COUNT(*) FILTER (WHERE activity_type = 'meeting')  as meetings,\n            COUNT(*) FILTER (WHERE activity_type = 'task'\n                AND status != 'completed')                     as open_tasks\n        FROM activities\n        WHERE linked_module = 'contacts'\n          AND linked_record_id = $1\n          AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "total",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "calls",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "emails",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "meetings",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "open_tasks",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "be72dcf91279e463568029d8d276e19aa2da9c24d77c5590bd673df4e7a5f521"
+}

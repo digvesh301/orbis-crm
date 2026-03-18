@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT o.id, o.name, o.amount, o.currency, ps.name as stage_name, ps.color,\n               o.stage_type::text as \"stage_type!\"\n        FROM opportunities o\n        JOIN pipeline_stages ps ON ps.id = o.stage_id\n        WHERE o.contact_id = $1 AND o.org_id = $2\n          AND o.stage_type::text = 'open' AND o.deleted_at IS NULL\n        ORDER BY o.created_at DESC\n        LIMIT 5\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "amount",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 3,
+        "name": "currency",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "stage_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "color",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "stage_type!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "f690b45a2112b23d98c0d9c7b7d4649c65edb4041f0dd959256dfbefb76166cf"
+}

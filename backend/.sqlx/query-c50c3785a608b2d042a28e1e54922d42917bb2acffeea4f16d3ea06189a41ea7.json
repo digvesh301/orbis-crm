@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE pipeline_stages\n        SET \n            name = COALESCE($3, name),\n            stage_type = COALESCE(CAST($4::text as opportunity_stage_type), stage_type),\n            probability = COALESCE($5, probability),\n            color = COALESCE($6, color),\n            updated_at = NOW()\n        WHERE id = $1 AND org_id = $2\n        RETURNING id, updated_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Text",
+        "Int4",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "c50c3785a608b2d042a28e1e54922d42917bb2acffeea4f16d3ea06189a41ea7"
+}

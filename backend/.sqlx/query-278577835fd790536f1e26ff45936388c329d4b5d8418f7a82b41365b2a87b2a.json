@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO quotes (\n            org_id, quote_number, subject, description, status, contact_id, account_id,\n            opportunity_id, currency, valid_until, payment_terms, delivery_terms, notes,\n            terms_conditions, discount_type, discount_value, shipping_cost, owner_id, created_by\n        )\n        VALUES (\n            $1, $2, $3, $4, CAST($5::text as quote_status), $6, $7,\n            $8, CAST($9::text as text), $10, $11, $12, $13,\n            $14, CAST($15::text as discount_type), $16, $17, $18, $19\n        )\n        RETURNING id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Date",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Numeric",
+        "Numeric",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "278577835fd790536f1e26ff45936388c329d4b5d8418f7a82b41365b2a87b2a"
+}

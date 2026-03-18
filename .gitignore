@@ -1,0 +1,36 @@
+# Environment variables - NEVER commit these
+.env
+.env.local
+.env.production
+
+# Rust
+backend/target/
+# NOTE: Cargo.lock is intentionally committed for binary crates (reproducible builds)
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/tsconfig.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
+
+# Build artifacts
+*.o
+*.out

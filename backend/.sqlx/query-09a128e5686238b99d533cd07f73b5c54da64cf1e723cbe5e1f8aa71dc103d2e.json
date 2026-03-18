@@ -1,0 +1,94 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT u.id, u.first_name, u.last_name, u.email, u.title, u.status::text as \"status\",\n               u.last_active_at, u.created_at,\n               u.profile_id, p.name as \"profile_name?\",\n               u.direct_manager_id, m.first_name as \"m_first?\", m.last_name as \"m_last?\"\n        FROM users u\n        LEFT JOIN profiles p ON p.id = u.profile_id\n        LEFT JOIN users m ON m.id = u.direct_manager_id\n        WHERE u.org_id = $1 AND u.deleted_at IS NULL\n        ORDER BY u.created_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "last_active_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "profile_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 9,
+        "name": "profile_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "direct_manager_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 11,
+        "name": "m_first?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "m_last?",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      null,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "09a128e5686238b99d533cd07f73b5c54da64cf1e723cbe5e1f8aa71dc103d2e"
+}

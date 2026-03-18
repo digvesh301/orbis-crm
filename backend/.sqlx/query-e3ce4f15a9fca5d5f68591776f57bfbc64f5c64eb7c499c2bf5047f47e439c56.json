@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO emails (\n            org_id, direction, status, from_email, from_name,\n            to_emails, cc_emails, bcc_emails, subject, body_html, body_text,\n            scheduled_at, sent_at, linked_module, linked_record_id, created_by\n        )\n        VALUES (\n            $1, 'outbound', CAST($2::text as email_status), $3, $4,\n            $5, $6, $7, $8, $9, $10,\n            $11, $12, $13, $14, $15\n        )\n        RETURNING id, tracking_id, created_at\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "tracking_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Jsonb",
+        "Jsonb",
+        "Jsonb",
+        "Text",
+        "Text",
+        "Text",
+        "Timestamptz",
+        "Timestamptz",
+        "Text",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "e3ce4f15a9fca5d5f68591776f57bfbc64f5c64eb7c499c2bf5047f47e439c56"
+}

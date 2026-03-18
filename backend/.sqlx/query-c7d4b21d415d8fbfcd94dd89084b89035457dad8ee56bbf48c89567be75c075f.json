@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE organizations\n        SET \n            name = COALESCE($2, name),\n            website = COALESCE($3, website),\n            phone = COALESCE($4, phone),\n            timezone = COALESCE($5, timezone),\n            date_format = COALESCE($6, date_format),\n            currency = COALESCE($7, currency),\n            currency_symbol = COALESCE($8, currency_symbol),\n            updated_at = NOW()\n        WHERE id = $1 AND is_active = true\n        RETURNING id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c7d4b21d415d8fbfcd94dd89084b89035457dad8ee56bbf48c89567be75c075f"
+}

@@ -1,0 +1,173 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT l.id, l.first_name, l.last_name, l.email, l.phone, l.company, l.title, l.website, l.description,\n               l.status::text as \"status!\", l.lead_source::text as \"lead_source?\", l.rating,\n               l.tags, l.estimated_value, l.currency, l.is_converted, l.converted_at, \n               l.converted_contact_id, l.converted_account_id, l.address,\n               l.created_at, l.updated_at,\n               l.owner_id,\n               u.first_name as \"owner_first_name?\", u.last_name as \"owner_last_name?\", u.avatar_url as \"owner_avatar?\"\n        FROM leads l\n        LEFT JOIN users u ON u.id = l.owner_id\n        WHERE l.id = $1 AND l.org_id = $2 AND l.deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "phone",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "company",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
+        "name": "website",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "description",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "status!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 10,
+        "name": "lead_source?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 11,
+        "name": "rating",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 12,
+        "name": "tags",
+        "type_info": "TextArray"
+      },
+      {
+        "ordinal": 13,
+        "name": "estimated_value",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 14,
+        "name": "currency",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 15,
+        "name": "is_converted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 16,
+        "name": "converted_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 17,
+        "name": "converted_contact_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 18,
+        "name": "converted_account_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 19,
+        "name": "address",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 20,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 21,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 22,
+        "name": "owner_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 23,
+        "name": "owner_first_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 24,
+        "name": "owner_last_name?",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 25,
+        "name": "owner_avatar?",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      null,
+      null,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "64edf6ca4a66860d7079e9fa5d5255a2f0ac916e2749a0a559e6e41dc92c762a"
+}
