@@ -1,5 +1,5 @@
 # /home/digvesh-dadhaniya/Desktop/orbis-crm/backend/Dockerfile
-FROM rust:1.80-slim-bookworm AS builder
+FROM rust:1.85-slim-bookworm AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y pkg-config libssl-dev
