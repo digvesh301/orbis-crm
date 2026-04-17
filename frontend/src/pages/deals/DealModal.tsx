@@ -13,6 +13,7 @@ export default function DealModal({ isOpen, onClose }: DealModalProps) {
     const [formData, setFormData] = useState({
         name: '',
         amount: '',
+        probability: '',
         stage_id: '',
         contact_id: null as string | null, // optional for simplicity
     });
@@ -27,6 +28,16 @@ export default function DealModal({ isOpen, onClose }: DealModalProps) {
     });
     const pipelineStages = stagesData?.data || [];
 
+    const { data: contactsData } = useQuery({
+        queryKey: ['contacts'],
+        queryFn: async () => {
+            const res = await api.get('/contacts');
+            return res.data;
+        },
+        enabled: isOpen,
+    });
+    const contacts = contactsData?.data || [];
+
     useEffect(() => {
         if (isOpen && pipelineStages.length > 0 && !formData.stage_id) {
             setFormData(prev => ({ ...prev, stage_id: pipelineStages[0].id }));
@@ -39,7 +50,7 @@ export default function DealModal({ isOpen, onClose }: DealModalProps) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['deals'] });
-            setFormData({ name: '', amount: '', stage_id: pipelineStages[0]?.id || '', contact_id: null });
+            setFormData({ name: '', amount: '', probability: '', stage_id: pipelineStages[0]?.id || '', contact_id: null });
             onClose();
         }
     });
@@ -76,28 +87,65 @@ export default function DealModal({ isOpen, onClose }: DealModalProps) {
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Amount</label>
-                        <input 
-                            type="number"
-                            value={formData.amount}
-                            onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                            className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-medium"
-                            placeholder="5000"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Value (Amount)</label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <IndianRupee className="w-4 h-4" />
+                                </span>
+                                <input 
+                                    type="number"
+                                    value={formData.amount}
+                                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block pl-9 p-2.5 font-medium"
+                                    placeholder="5000"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Win Probability (%)</label>
+                            <div className="relative">
+                                <input 
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={formData.probability}
+                                    onChange={e => setFormData({ ...formData, probability: e.target.value })}
+                                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-medium pr-8"
+                                    placeholder="Auto"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-1">Pipeline Stage *</label>
-                        <select
-                            value={formData.stage_id}
-                            onChange={e => setFormData({ ...formData, stage_id: e.target.value })}
-                            className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-medium"
-                        >
-                            {pipelineStages.map((stage: any) => (
-                                <option key={stage.id} value={stage.id}>{stage.name}</option>
-                            ))}
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Pipeline Stage *</label>
+                            <select
+                                value={formData.stage_id}
+                                onChange={e => setFormData({ ...formData, stage_id: e.target.value })}
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-medium"
+                            >
+                                {pipelineStages.map((stage: any) => (
+                                    <option key={stage.id} value={stage.id}>{stage.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-bold text-slate-700 mb-1">Associated Contact</label>
+                            <select
+                                value={formData.contact_id || ''}
+                                onChange={e => setFormData({ ...formData, contact_id: e.target.value || null })}
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 font-medium"
+                            >
+                                <option value="">Select a contact...</option>
+                                {contacts.map((c: any) => (
+                                    <option key={c.id} value={c.id}>{c.first_name} {c.last_name}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -112,7 +160,8 @@ export default function DealModal({ isOpen, onClose }: DealModalProps) {
                         disabled={!formData.name.trim() || !formData.stage_id || mutation.isPending}
                         onClick={() => mutation.mutate({
                             ...formData,
-                            amount: formData.amount ? Number(formData.amount) : undefined
+                            amount: formData.amount ? Number(formData.amount) : undefined,
+                            probability: formData.probability ? Number(formData.probability) : undefined
                         })}
                         className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors flex items-center gap-2"
                     >

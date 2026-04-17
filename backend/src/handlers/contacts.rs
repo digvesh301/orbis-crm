@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Contacts Handler — Full CRUD with filters, search, pagination
+// Contacts Handler — Full CRUD with filters, search, pagination, bulk ops
 //
 // All queries are O(log n) via indexed columns.
 // Search uses PostgreSQL GIN full-text index (pg_trgm).
-// Pagination uses OFFSET (simple), with cursor-based option planned for Day 18.
+// Bulk endpoints: mass-delete, mass-update, mass-transfer (all org-scoped).
 // ─────────────────────────────────────────────────────────────────────────────
 
 use axum::{
@@ -212,6 +212,9 @@ pub async fn list_contacts(
                     "city" => {
                          if let Some(s) = val.as_str() { qb.push(" AND c.address->>'city' ILIKE "); qb.push_bind(format!("%{}%", s)); }
                     },
+                    "tag" => {
+                         if let Some(s) = val.as_str() { qb.push(" AND "); qb.push_bind(s.to_string()); qb.push(" = ANY(c.tags) "); }
+                    },
                     "created_after" => {
                          if let Some(s) = val.as_str() {
                              if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(s) {
@@ -220,8 +223,29 @@ pub async fn list_contacts(
                              }
                          }
                     },
-                    "tag" => {
-                         if let Some(s) = val.as_str() { qb.push(" AND "); qb.push_bind(s.to_string()); qb.push(" = ANY(c.tags) "); }
+                    "created_before" => {
+                         if let Some(s) = val.as_str() {
+                             if let Ok(dt) = chrono::DateTime::parse_from_rfc3339(s) {
+                                 qb.push(" AND c.created_at <= ");
+                                 qb.push_bind(dt.with_timezone(&chrono::Utc));
+                             }
+                         }
+                    },
+                    "lead_source" => {
+                         if let Some(s) = val.as_str() {
+                             qb.push(" AND c.lead_source::text = ");
+                             qb.push_bind(s.to_string());
+                         }
+                    },
+                    "do_not_email" => {
+                         if let Some(s) = val.as_str() {
+                             if let Ok(b) = s.parse::<bool>() { qb.push(" AND c.do_not_email = "); qb.push_bind(b); }
+                         }
+                    },
+                    "do_not_call" => {
+                         if let Some(s) = val.as_str() {
+                             if let Ok(b) = s.parse::<bool>() { qb.push(" AND c.do_not_call = "); qb.push_bind(b); }
+                         }
                     },
                     _ => {} 
                 }
@@ -648,6 +672,206 @@ pub async fn delete_contact(
     Ok(Json(json!({ "success": true, "message": "Contact deleted" })))
 }
 
+// ─── Bulk Operation Request Types ────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct MassDeleteRequest {
+    pub ids: Vec<Uuid>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MassUpdateRequest {
+    pub ids:    Vec<Uuid>,
+    pub updates: MassUpdateFields,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MassUpdateFields {
+    pub status:      Option<String>,
+    pub owner_id:    Option<Uuid>,
+    pub tags:        Option<Vec<String>>,
+    pub lead_source: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MassTransferRequest {
+    pub ids:          Vec<Uuid>,
+    pub new_owner_id: Uuid,
+}
+
+// ─── POST /api/v1/contacts/mass-delete ───────────────────────────────────────
+// Soft-delete multiple contacts in a single query (org-scoped, audited)
+
+pub async fn mass_delete_contacts(
+    State(state): State<AppState>,
+    auth: AuthUser,
+    Json(body): Json<MassDeleteRequest>,
+) -> AppResult<impl IntoResponse> {
+    if body.ids.is_empty() {
+        return Err(AppError::Validation("No contact IDs provided".into()));
+    }
+    if body.ids.len() > 200 {
+        return Err(AppError::Validation("Cannot delete more than 200 contacts at once".into()));
+    }
+
+    // Build parameterized query for the ID list
+    let mut qb = sqlx::QueryBuilder::new(
+        "UPDATE contacts SET deleted_at = NOW() WHERE org_id = "
+    );
+    qb.push_bind(auth.org_id);
+    qb.push(" AND deleted_at IS NULL AND id = ANY(");
+    qb.push_bind(&body.ids);
+    qb.push(") RETURNING id");
+
+    let deleted: Vec<(Uuid,)> = qb.build_query_as()
+        .fetch_all(&state.db)
+        .await?;
+
+    let count = deleted.len() as i64;
+
+    // Bulk audit log
+    let _ = sqlx::query(
+        "INSERT INTO audit_logs (org_id, user_id, action, entity_type, entity_name)
+         VALUES ($1, $2, 'mass_deleted', 'contact', $3)"
+    )
+    .bind(auth.org_id)
+    .bind(auth.user_id)
+    .bind(format!("Bulk deleted {} contacts", count))
+    .execute(&state.db)
+    .await;
+
+    Ok(Json(json!({
+        "success": true,
+        "message": format!("{} contact(s) deleted", count),
+        "deleted_count": count,
+    })))
+}
+
+// ─── PUT /api/v1/contacts/mass-update ────────────────────────────────────────
+// Update selected fields on multiple contacts at once
+
+pub async fn mass_update_contacts(
+    State(state): State<AppState>,
+    auth: AuthUser,
+    Json(body): Json<MassUpdateRequest>,
+) -> AppResult<impl IntoResponse> {
+    if body.ids.is_empty() {
+        return Err(AppError::Validation("No contact IDs provided".into()));
+    }
+    if body.ids.len() > 200 {
+        return Err(AppError::Validation("Cannot update more than 200 contacts at once".into()));
+    }
+
+    let up = &body.updates;
+
+    let mut qb = sqlx::QueryBuilder::new("UPDATE contacts SET updated_at = NOW()");
+
+    if let Some(ref status) = up.status {
+        qb.push(", status = ");
+        qb.push_bind(status);
+        qb.push("::contact_status");
+    }
+    if let Some(owner) = up.owner_id {
+        qb.push(", owner_id = ");
+        qb.push_bind(owner);
+    }
+    if let Some(ref tags) = up.tags {
+        qb.push(", tags = ");
+        qb.push_bind(tags);
+    }
+    if let Some(ref source) = up.lead_source {
+        qb.push(", lead_source = ");
+        qb.push_bind(source);
+        qb.push("::lead_source_enum");
+    }
+
+    qb.push(" WHERE org_id = ");
+    qb.push_bind(auth.org_id);
+    qb.push(" AND deleted_at IS NULL AND id = ANY(");
+    qb.push_bind(&body.ids);
+    qb.push(")");
+
+    qb.build().execute(&state.db).await?;
+
+    let _ = sqlx::query(
+        "INSERT INTO audit_logs (org_id, user_id, action, entity_type, entity_name)
+         VALUES ($1, $2, 'mass_updated', 'contact', $3)"
+    )
+    .bind(auth.org_id)
+    .bind(auth.user_id)
+    .bind(format!("Bulk updated {} contacts", body.ids.len()))
+    .execute(&state.db)
+    .await;
+
+    Ok(Json(json!({
+        "success": true,
+        "message": format!("{} contact(s) updated", body.ids.len()),
+        "updated_count": body.ids.len(),
+    })))
+}
+
+// ─── PUT /api/v1/contacts/mass-transfer ──────────────────────────────────────
+// Re-assign owner on multiple contacts
+
+pub async fn mass_transfer_contacts(
+    State(state): State<AppState>,
+    auth: AuthUser,
+    Json(body): Json<MassTransferRequest>,
+) -> AppResult<impl IntoResponse> {
+    if body.ids.is_empty() {
+        return Err(AppError::Validation("No contact IDs provided".into()));
+    }
+    if body.ids.len() > 200 {
+        return Err(AppError::Validation("Cannot transfer more than 200 contacts at once".into()));
+    }
+
+    // Verify the target user belongs to the same org
+    let target_exists: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM users WHERE id = $1 AND org_id = $2 AND deleted_at IS NULL"
+    )
+    .bind(body.new_owner_id)
+    .bind(auth.org_id)
+    .fetch_one(&state.db)
+    .await
+    .unwrap_or((0,));
+
+    if target_exists.0 == 0 {
+        return Err(AppError::Validation("Target owner not found in your organization".into()));
+    }
+
+    let mut qb = sqlx::QueryBuilder::new(
+        "UPDATE contacts SET owner_id = "
+    );
+    qb.push_bind(body.new_owner_id);
+    qb.push(", updated_at = NOW() WHERE org_id = ");
+    qb.push_bind(auth.org_id);
+    qb.push(" AND deleted_at IS NULL AND id = ANY(");
+    qb.push_bind(&body.ids);
+    qb.push(") RETURNING id");
+
+    let transferred: Vec<(Uuid,)> = qb.build_query_as()
+        .fetch_all(&state.db)
+        .await?;
+
+    let count = transferred.len() as i64;
+
+    let _ = sqlx::query(
+        "INSERT INTO audit_logs (org_id, user_id, action, entity_type, entity_name)
+         VALUES ($1, $2, 'mass_transferred', 'contact', $3)"
+    )
+    .bind(auth.org_id)
+    .bind(auth.user_id)
+    .bind(format!("Transferred {} contacts to new owner", count))
+    .execute(&state.db)
+    .await;
+
+    Ok(Json(json!({
+        "success": true,
+        "message": format!("{} contact(s) transferred", count),
+        "transferred_count": count,
+    })))
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /// Format an owner name from optional string slices (works with both
@@ -661,6 +885,7 @@ fn fmt_name(first: Option<&str>, last: Option<&str>) -> Option<String> {
 }
 
 /// Legacy wrapper kept for cross-file compatibility
+#[allow(dead_code)]
 fn format_name(first: &Option<String>, last: &Option<String>) -> Option<String> {
     fmt_name(first.as_deref(), last.as_deref())
 }
@@ -668,12 +893,17 @@ fn format_name(first: &Option<String>, last: &Option<String>) -> Option<String> 
 // ─── Router ───────────────────────────────────────────────────────────────────
 
 pub fn router(state: AppState) -> axum::Router<AppState> {
-    use axum::routing::get;
+    use axum::routing::{get, post, put};
     use axum::middleware::from_fn_with_state;
     use crate::middleware::auth::auth_middleware;
 
     axum::Router::<AppState>::new()
+        // Core CRUD
         .route("/",    get(list_contacts).post(create_contact))
         .route("/:id", get(get_contact).patch(update_contact).delete(delete_contact))
+        // Bulk operations
+        .route("/mass-delete",   post(mass_delete_contacts))
+        .route("/mass-update",   put(mass_update_contacts))
+        .route("/mass-transfer", put(mass_transfer_contacts))
         .route_layer(from_fn_with_state(state, auth_middleware))
 }

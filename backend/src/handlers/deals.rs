@@ -95,7 +95,7 @@ pub async fn list_deals(
         SELECT d.id, d.name, d.description, d.amount, d.currency, d.probability, d.expected_revenue,
                d.close_date, d.actual_close_date, d.lead_source::text as "lead_source", d.tags, d.stage_type::text as "stage_type",
                d.created_at, d.updated_at,
-               d.stage_id,
+               d.stage_id, ps.name as stage_name, ps.color as stage_color,
                d.contact_id, c.first_name as contact_first, c.last_name as contact_last,
                d.account_id, a.name as account_name,
                d.owner_id, u.first_name as owner_first, u.last_name as owner_last, u.avatar_url as owner_avatar
@@ -169,6 +169,11 @@ pub async fn list_deals(
             "created_at":       row.get::<chrono::DateTime<chrono::Utc>, _>("created_at"),
             "updated_at":       row.get::<chrono::DateTime<chrono::Utc>, _>("updated_at"),
             "stage_id":         row.get::<Uuid, _>("stage_id"),
+            "stage": {
+                "id": row.get::<Uuid, _>("stage_id"),
+                "name": row.get::<Option<String>, _>("stage_name"),
+                "color": row.get::<Option<String>, _>("stage_color")
+            },
             "contact": row.get::<Option<Uuid>, _>("contact_id").map(|id| json!({
                 "id": id,
                 "name": fmt_name(c_first.as_deref(), c_last.as_deref())

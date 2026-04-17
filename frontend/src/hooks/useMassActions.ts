@@ -1,49 +1,62 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 
+interface MassTransferPayload {
+    ids:          string[];
+    new_owner_id: string;
+}
+
 interface MassUpdatePayload {
-    ids: string[];
+    ids:     string[];
     updates: Record<string, any>;
 }
 
+/**
+ * useMassActions — provides mass-delete, mass-update, and mass-transfer
+ * mutations for any CRM module. All hits the backend with org-scoped endpoints.
+ *
+ * Usage:
+ *   const { massDelete, isDeleting } = useMassActions('contacts');
+ *   await massDelete(['uuid1', 'uuid2']);
+ */
 export function useMassActions(module: string) {
     const queryClient = useQueryClient();
 
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: [module] });
+
+    // ─── Mass Delete: POST /contacts/mass-delete ──────────────────────
     const massDeleteMutation = useMutation({
         mutationFn: async (ids: string[]) => {
-            // Ideally backend supports DELETE /<module>/mass with array of IDs
-            // For now, if we don't have mass delete, we can iterate or send as payload
-            return await api.post(`/${module}/mass-delete`, { ids });
+            const res = await api.post(`/${module}/mass-delete`, { ids });
+            return res.data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [module] });
-        }
+        onSuccess: invalidate,
     });
 
+    // ─── Mass Update: PUT /contacts/mass-update ───────────────────────
     const massUpdateMutation = useMutation({
         mutationFn: async (payload: MassUpdatePayload) => {
-            return await api.put(`/${module}/mass-update`, payload);
+            const res = await api.put(`/${module}/mass-update`, payload);
+            return res.data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [module] });
-        }
+        onSuccess: invalidate,
     });
 
+    // ─── Mass Transfer: PUT /contacts/mass-transfer ───────────────────
     const massTransferMutation = useMutation({
-        mutationFn: async (payload: { ids: string[], new_owner_id: string }) => {
-            return await api.put(`/${module}/mass-transfer`, payload);
+        mutationFn: async (payload: MassTransferPayload) => {
+            const res = await api.put(`/${module}/mass-transfer`, payload);
+            return res.data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [module] });
-        }
+        onSuccess: invalidate,
     });
 
     return {
-        massDelete: massDeleteMutation.mutateAsync,
-        isDeleting: massDeleteMutation.isPending,
-        massUpdate: massUpdateMutation.mutateAsync,
-        isUpdating: massUpdateMutation.isPending,
-        massTransfer: massTransferMutation.mutateAsync,
+        massDelete:     massDeleteMutation.mutateAsync,
+        isDeleting:     massDeleteMutation.isPending,
+        massUpdate:     massUpdateMutation.mutateAsync,
+        isUpdating:     massUpdateMutation.isPending,
+        massTransfer:   massTransferMutation.mutateAsync,
         isTransferring: massTransferMutation.isPending,
     };
 }

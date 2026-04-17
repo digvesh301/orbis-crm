@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../lib/api';
-import { IndianRupee, Layers, CheckCircle2, AlertCircle, Download } from 'lucide-react';
+import { IndianRupee, CheckCircle2, AlertCircle, Download } from 'lucide-react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { exportToCsv } from '../../lib/exportUtils';
 import DealDetail from './DealDetail';
@@ -25,22 +25,35 @@ function DealsList() {
         <div className="p-8 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Deals (Opportunities)</h1>
-                    <p className="text-slate-500 mt-1">Manage active sales, track revenue and negotiate with prospects.</p>
+                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Deals (Opportunities)</h1>
+                    <p className="text-slate-500 mt-2 text-sm font-medium">Manage active sales, track revenue and negotiate with prospects.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <a href="/pipeline" className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2 cursor-pointer">
-                        <Layers className="w-4 h-4" /> Kanban Board
-                    </a>
+                <div className="flex items-center gap-4">
+                    <div className="bg-slate-100/80 p-1 rounded-lg flex items-center border border-slate-200 shadow-inner">
+                        <button className="bg-white shadow-sm text-slate-800 px-4 py-1.5 text-sm font-bold rounded-md flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}> <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /> </svg>
+                            List View
+                        </button>
+                        <button 
+                            onClick={() => navigate('/pipeline')}
+                            className="text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 px-4 py-1.5 text-sm font-bold rounded-md flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}> <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /> </svg>
+                            Board View
+                        </button>
+                    </div>
+
+                    <div className="h-8 w-px bg-slate-200 mx-1"></div>
+
                     <button 
                         onClick={() => exportToCsv('/deals', 'deals_export')}
-                        className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors cursor-pointer flex items-center gap-2">
-                        <Download className="w-4 h-4" /> Export CSV
+                        className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition-colors cursor-pointer flex items-center gap-2">
+                        <Download className="w-4 h-4 pl-0.5" /> Export
                     </button>
                     <button 
                         onClick={() => setIsModalOpen(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors cursor-pointer">
-                        Create Deal
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-sm transition-colors cursor-pointer">
+                        New Deal
                     </button>
                 </div>
             </div>
